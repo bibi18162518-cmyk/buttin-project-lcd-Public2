@@ -1,0 +1,91 @@
+#include <LiquidCrystal.h>
+
+LiquidCrystal lcd(4, 6, 10, 11, 12, 13);
+
+#define BUTTON_RIGHT 3
+#define BUTTON_LEFT  5
+#define BUTTON_UP    8
+#define BUTTON_DOWN  9
+
+int shapeX = 0;
+int shapeY = 1;
+
+bool lastRight = LOW;
+bool lastLeft  = LOW;
+bool lastUp    = LOW;
+bool lastDown  = LOW;
+
+byte diamond[8] = {
+  B00000,
+  B00100,
+  B01110,
+  B11111,
+  B01110,
+  B00100,
+  B00000,
+  B00000
+};
+
+void drawShape() {
+  lcd.setCursor(shapeX, shapeY);
+  lcd.write(byte(0));
+}
+
+void eraseShape() {
+  lcd.setCursor(shapeX, shapeY);
+  lcd.print(" ");
+}
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(BUTTON_RIGHT, INPUT);
+  pinMode(BUTTON_LEFT,  INPUT);
+  pinMode(BUTTON_UP,    INPUT);
+  pinMode(BUTTON_DOWN,  INPUT);
+  lcd.createChar(0, diamond);
+  drawShape();
+}
+
+void loop() {
+  bool right = digitalRead(BUTTON_RIGHT);
+  bool left  = digitalRead(BUTTON_LEFT);
+  bool up    = digitalRead(BUTTON_UP);
+  bool down  = digitalRead(BUTTON_DOWN);
+
+  if (lastRight == LOW && right == HIGH) {
+    eraseShape();
+    shapeX++;
+    if (shapeX > 15) shapeX = 0;
+    drawShape();
+    delay(50);
+  }
+
+  if (lastLeft == LOW && left == HIGH) {
+    eraseShape();
+    shapeX--;
+    if (shapeX < 0) shapeX = 15;
+    drawShape();
+    delay(50);
+  }
+
+  if (lastUp == LOW && up == HIGH) {
+    eraseShape();
+    shapeY--;
+    if (shapeY < 0) shapeY = 1;
+    drawShape();
+    delay(50);
+  }
+
+  if (lastDown == LOW && down == HIGH) {
+    eraseShape();
+    shapeY++;
+    if (shapeY > 1) shapeY = 0;
+    drawShape();
+    delay(50);
+  }
+
+  lastRight = right;
+  lastLeft  = left;
+  lastUp    = up;
+  lastDown  = down;
+}
